@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react';
 import LoginPage from './pages/auth/LoginPage';
 import Menu from './components/Menu';
 import TabRoot2 from './pages/tabroot2';
+import { getDBInitByName } from './database';
 
 setupIonicReact();
 
@@ -40,6 +41,7 @@ export let existingConn: any;
 const App: React.FC = () => {
 
   const { authInfo, initialize } = useAuth()!;
+  const [iniDBStatus, setiniDBStatus] = useState<Boolean>(false);
   const [existConn, setExistConn] = useState(false);
   existingConn = { existConn: existConn, setExistConn: setExistConn };
 
@@ -67,7 +69,18 @@ const App: React.FC = () => {
     !authInfo?.initialized && (async () => await initialize())();
   }, [authInfo, initialize]);
 
-  if (!authInfo || !authInfo.initialized) {
+  useEffect(() => {
+    let initDB = async () => {
+      await getDBInitByName('aahk', 'no-encryption')
+      setiniDBStatus(true)
+    }
+    initDB()
+    //.then(async syncLocalAAHKDB)
+  }, [])
+
+
+
+  if (!authInfo || !authInfo.initialized || !iniDBStatus) {
     return (
       <IonApp>
         <IonLoading isOpen={true} />
