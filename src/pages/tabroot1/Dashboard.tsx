@@ -1,7 +1,9 @@
-import { IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonList, IonLoading, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonGrid, IonHeader, IonInput, IonItem, IonLabel, IonList, IonLoading, IonMenuButton, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
 import { map } from 'ionicons/icons';
 import { useEffect, useState } from 'react';
-import { sqlQuery } from '../../database';
+import { sqlite } from '../../App';
+import { sqlExecuteStatement, sqlQuery } from '../../database';
+import { deleteAllUsers } from '../../Utils/noEncryptionUtils';
 import './Dashboard.css';
 
 // SQLITE IMPORTS
@@ -19,17 +21,33 @@ interface IPerformanceData {
 const Dashboard: React.FC = () => {
   const [resultList, SetResultList] = useState<Array<IPerformanceData>>();
   const [loadDataStatus, SetLoadDataStatus] = useState<Boolean>(false);
+  const [text, SetText] = useState<string>("");
 
   useEffect(() => {
-    const queryData = async () => {
-      let resp = await sqlQuery('aahk', 'SELECT * FROM users;')
-      alert(JSON.parse(JSON.stringify(resp.values)))
-      SetResultList(resp.values)
-      SetLoadDataStatus(true)
-    }
     queryData()
   }, [])
 
+  const queryData = async () => {
+    let resp = await sqlQuery('aahk', 'SELECT * FROM users;')
+    SetResultList(resp.values)
+    SetLoadDataStatus(true)
+  }
+
+  const addRecord = async (text: string) => {
+    let isConnected = await sqlite.isConnection('aahk');
+    if (isConnected.result) {
+      await sqlExecuteStatement('aahk', `INSERT INTO users (name,email,age) VALUES ("${text}","${text}.com",24);`)
+      queryData()
+    }
+  }
+
+  const deleteAllRecords = async () => {
+    let isConnected = await sqlite.isConnection('aahk');
+    if (isConnected.result) {
+      await sqlExecuteStatement('aahk', deleteAllUsers)
+      queryData()
+    }
+  }
 
   if (!loadDataStatus) {
     return (
@@ -48,7 +66,6 @@ const Dashboard: React.FC = () => {
       </IonPage>
     );
   } else {
-    alert("resultList: " + resultList)
     return (
 
       <IonPage>
@@ -66,8 +83,15 @@ const Dashboard: React.FC = () => {
               <IonTitle size="large">Dashboard</IonTitle>
             </IonToolbar>
           </IonHeader>
+          <IonLabel position="floating">Type here...</IonLabel>
+          <IonInput value={text} onIonChange={(e: any) => { SetText(e.target.value) }}></IonInput>
+          <IonGrid>
+            <IonRow>
+              <IonButton color='success' onClick={() => addRecord(text)}>Add Record</IonButton>
+              <IonButton color='danger' onClick={() => { deleteAllRecords() }}>Delete All</IonButton>
+            </IonRow>
+          </IonGrid>
           {resultList?.map((v, i) => {
-            alert(v)
             return (
               <IonList>
                 <IonItem>
