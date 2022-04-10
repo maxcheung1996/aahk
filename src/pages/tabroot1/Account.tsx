@@ -2,6 +2,20 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonItem, IonLabel, IonLis
 import './Account.css';
 import { useAuth } from "../auth/authContext";
 import { useHistory } from 'react-router';
+import { Network } from '@capacitor/network';
+
+Network.addListener('networkStatusChange', status => {
+  alert('Network status changed: ' + status);
+});
+
+const logCurrentNetworkStatus = async () => {
+  try {
+    const status = await Network.getStatus();
+    alert('Network status: ' + JSON.stringify(status));
+  } catch (error) {
+    alert('Get Network status error: ' + error);
+  }
+};
 
 const Account: React.FC = () => {
 
@@ -24,6 +38,7 @@ const Account: React.FC = () => {
             <IonTitle size="large">Account</IonTitle>
           </IonToolbar>
         </IonHeader>
+        <IonButton color='tertiary' onClick={logCurrentNetworkStatus}>Get Network Status</IonButton>
         <IonList>
           <IonItem>
             <IonLabel>Welcome {authInfo.user.email} !</IonLabel>
