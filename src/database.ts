@@ -1,6 +1,7 @@
 import { capSQLiteValues } from '@capacitor-community/sqlite';
 import { SQLiteDBConnection } from 'react-sqlite-hook';
 import { sqlite } from '../src/App';
+import { createTablesNoEncryption } from './Utils/noEncryptionUtils';
 
 export const getDBInitByName = async (name: string, encryption: string) => {
     try {
@@ -19,6 +20,7 @@ export const getDBInitByName = async (name: string, encryption: string) => {
                 alert("isDBConnected final check error: " + error)
             }
         }
+        await sqlExecuteStatement("aahk", createTablesNoEncryption)
         alert("initdb - aahk")
     } catch (error) {
         alert("getDBInitByName Error: " + error)
