@@ -1,0 +1,10 @@
+/* ion-card{
+        display: flex;
+        flex-direction: column;
+        margin: 0 !important;
+      } */
+/* ion-content{
+} */
+ion-card{
+  width: 100%;
+}

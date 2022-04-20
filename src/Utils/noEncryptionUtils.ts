@@ -23,10 +23,47 @@ export const createTablesNoEncryption: string = `
       base64 TEXT,
       last_modified INTEGER DEFAULT (strftime('%s', 'now'))
     );
+    CREATE TABLE IF NOT EXISTS eform_result_main (
+      id INTEGER PRIMARY KEY NOT NULL,
+      eform_result_main_guid TEXT,
+      eform_define_guid TEXT,
+      ref_no TEXT,
+      proj_code TEXT,
+      proj_guid TEXT, 
+      is_deleted TEXT,
+      eform_status TEXT,
+      created_by TEXT,
+      created_date TEXT,
+      last_modified INTEGER DEFAULT (strftime('%s', 'now'))
+    );
+    CREATE TABLE IF NOT EXISTS eform_result_table_1 (
+      id INTEGER PRIMARY KEY NOT NULL,
+      eform_result_guid TEXT,
+      eform_define_guid TEXT,
+      eform_quest_guid TEXT,
+      eform_result_main_guid TEXT,
+      sort TEXT,
+      alias TEXT,
+      fieldName TEXT,
+      defaultValues TEXT,
+      required TEXT,
+      pattern TEXT,
+      type TEXT,
+      value TEXT,
+      readOnly TEXT,
+      placeHolder TEXT,
+      disabled TEXT,
+      clearInput TEXT,
+      description TEXT,
+      option TEXT,
+      last_modified INTEGER DEFAULT (strftime('%s', 'now'))
+    );
     CREATE INDEX IF NOT EXISTS users_index_name ON users (name);
     CREATE INDEX IF NOT EXISTS users_index_last_modified ON users (last_modified);
     CREATE INDEX IF NOT EXISTS messages_index_last_modified ON messages (last_modified);
     CREATE INDEX IF NOT EXISTS com_file_index_last_modified ON com_file (last_modified);
+    CREATE INDEX IF NOT EXISTS eform_result_table_1_index_last_modified ON eform_result_table_1 (last_modified);
+    CREATE INDEX IF NOT EXISTS eform_result_main_index_last_modified ON eform_result_main (last_modified);
     CREATE TRIGGER IF NOT EXISTS users_trigger_last_modified 
     AFTER UPDATE ON users
     FOR EACH ROW WHEN NEW.last_modified <= OLD.last_modified  
@@ -43,6 +80,16 @@ export const createTablesNoEncryption: string = `
     BEGIN  
         UPDATE com_file SET last_modified= (strftime('%s', 'now')) WHERE id=OLD.id;   
     END;  
+    CREATE TRIGGER IF NOT EXISTS eform_result_table_1_index_last_modified AFTER UPDATE ON eform_result_table_1
+    FOR EACH ROW WHEN NEW.last_modified <= OLD.last_modified  
+    BEGIN  
+        UPDATE eform_result_table_1 SET last_modified= (strftime('%s', 'now')) WHERE id=OLD.id;   
+    END; 
+    CREATE TRIGGER IF NOT EXISTS eform_result_main_index_last_modified AFTER UPDATE ON eform_result_main
+    FOR EACH ROW WHEN NEW.last_modified <= OLD.last_modified  
+    BEGIN  
+        UPDATE eform_result_main SET last_modified= (strftime('%s', 'now')) WHERE id=OLD.id;   
+    END; 
     PRAGMA user_version = 1;
 `;
 export const importTwoUsers: string = `
